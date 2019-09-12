@@ -36,12 +36,22 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
-io.on('connection', function(socket){
+io.sockets.on('connection', function(socket){
+  socket.on('username', function(username) {
+    socket.username = username;
+    io.emit('is_online', '🔵 <i>' + socket.username + ' join the chat..</i>');
+});
+socket.on('disconnect', function(username) {
+  io.emit('is_online', '🔴 <i>' + socket.username + ' left the chat..</i>');
+})
+
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+    io.emit('chat message','<strong>' + socket.username + '<strong>:' +  msg);
   });
+
 });
 
-http.listen(port, function(){
+
+var sever = http.listen(port, function(){
   console.log('listening on *:' + port);
 });
